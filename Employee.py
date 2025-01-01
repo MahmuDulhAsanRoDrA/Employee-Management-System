@@ -51,7 +51,13 @@ def select(event):
         salaryEntry.insert(0, row[5])    # Salary
         emailEntry.insert(0, row[6])     # Email
 
-
+#def update_Employee():
+ #   selected=tree.selection()
+    #if not selected:
+      #  messagebox.showerror('Error','Select Data to update')
+    #else:
+         #db.update(idEntry.get(),nameEntry.get(),phoneEntry.get(),roleBox.get(),genderbox.get(),salaryEntry.get(),emailEntry.get())
+        # treeview_data()
 
 def clear(value = False):
     if value:
