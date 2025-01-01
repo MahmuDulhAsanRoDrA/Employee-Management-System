@@ -51,13 +51,7 @@ def select(event):
         salaryEntry.insert(0, row[5])    # Salary
         emailEntry.insert(0, row[6])     # Email
 
-#def update_Employee():
- #   selected=tree.selection()
-    #if not selected:
-      #  messagebox.showerror('Error','Select Data to update')
-    #else:
-         #db.update(idEntry.get(),nameEntry.get(),phoneEntry.get(),roleBox.get(),genderbox.get(),salaryEntry.get(),emailEntry.get())
-        # treeview_data()
+
 
 def clear(value = False):
     if value:
@@ -80,7 +74,8 @@ def treeview_data():
 # Validation function
 def validate_phone_number(phone):
 
-    if re.fullmatch(r'^(017|018|019|016|014|015|013)\d{8}$', phone):
+    #if re.fullmatch(r'^(017|018|019|016|014|015|013)\d{8}$', phone):
+    if re.fullmatch(r'^([01]+[3-9])\d{8}$', phone):
         return True
     else:
         return False
@@ -118,6 +113,7 @@ def update_Employee():
         messagebox.showerror('Error', 'Enter a valid email address ')
     else:
         db.update(idEntry.get(), nameEntry.get(), phoneEntry.get(), roleBox.get(), genderbox.get(), salaryEntry.get(), emailEntry.get())
+        messagebox.showinfo('Success','Update Completed')
         treeview_data()
 
 
