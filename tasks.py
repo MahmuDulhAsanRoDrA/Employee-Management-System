@@ -5,10 +5,12 @@ import datetime
 from tkinter import messagebox
 def select(event):
     selected = tree.selection()
+    global task
     if selected:
         row = tree.item(selected)['values']
         clear()
-        idEntry2.insert(0,row[0])
+        taskidEntry2.insert(0,row[0])
+        idEntry2.insert(0,row[1])
         task = db.fetch_today_task(row[0])
         Given_taskEntry2.insert("1.0", task[0])
 
@@ -46,8 +48,14 @@ def Task_form(window):
     # Configure Left Frame to be resizable
     leftFrame.grid_rowconfigure(0, weight=1)
     leftFrame.grid_columnconfigure(0, weight=1)
-    global idEntry,DeadlineEntry,Given_taskEntry
+    global idEntry,DeadlineEntry,Given_taskEntry,taskentry
     # Fields in Left Frame
+    task_id=CTkLabel(leftFrame,text='Task Id',font=('arial', 18, 'bold'), text_color='Black')
+    task_id.grid(row=0, column=0, padx=20, pady=10, sticky='w')
+
+    taskentry=CTkEntry(leftFrame, font=('arial', 15, 'bold'), width=200)
+    taskentry.grid(row=0, column=1, padx=20, pady=10, sticky='w')
+
     idLabel = CTkLabel(leftFrame, text='ID', font=('arial', 18, 'bold'), text_color='Black')
     idLabel.grid(row=1, column=0, padx=20, pady=10, sticky='w')
 
@@ -87,7 +95,8 @@ def Task_form(window):
     scroll.grid(row=0, column=1, sticky="ns")
     tree.configure(yscrollcommand=scroll.set)
 
-    tree['columns'] = ('ID', 'Role',  'Deadline', 'Within_Deadline', 'Rate', 'Complete')
+    tree['columns'] = ('Task ID','ID', 'Role',  'Deadline', 'Within_Deadline', 'Rate', 'Complete')
+    tree.heading('Task ID', text='Task ID')
     tree.heading('ID', text='ID')
     tree.heading('Role', text='Role')
     tree.heading('Deadline', text='Deadline')
@@ -95,6 +104,7 @@ def Task_form(window):
     tree.heading('Rate', text='Rate')
     tree.heading('Complete', text='Complete')
 
+    tree.column('Task ID', width=50)
     tree.column('ID', width=50)
     tree.column('Role', width=100)
     tree.column('Deadline', width=100)
@@ -112,26 +122,32 @@ def Task_form(window):
     lowerFrame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
     # ID, Within Deadline, and Rate Section
-    global idEntry2,withinDeadlineBox,rateBox,Given_taskEntry2
+    global idEntry2,withinDeadlineBox,rateBox,Given_taskEntry2,taskidEntry2
+
+    taskidLabel = CTkLabel(lowerFrame, text='Task ID', font=('arial', 14, 'bold'), text_color='white')
+    taskidLabel.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+
+    taskidEntry2 = CTkEntry(lowerFrame, font=('arial', 13), width=150)
+    taskidEntry2.grid(row=0, column=1, padx=10, pady=5)
 
     idLabel = CTkLabel(lowerFrame, text='ID', font=('arial', 14, 'bold'), text_color='white')
-    idLabel.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+    idLabel.grid(row=1, column=0, padx=10, pady=5, sticky='w')
 
     idEntry2 = CTkEntry(lowerFrame, font=('arial', 13), width=150)
-    idEntry2.grid(row=0, column=1, padx=10, pady=5)
+    idEntry2.grid(row=1, column=1, padx=10, pady=5)
 
     withinDeadlineLabel = CTkLabel(lowerFrame, text='Within Deadline', font=('arial', 14, 'bold'), text_color='white')
-    withinDeadlineLabel.grid(row=1, column=0, padx=10, pady=5, sticky='w')
+    withinDeadlineLabel.grid(row=2, column=0, padx=10, pady=5, sticky='w')
 
     withinDeadlineBox = CTkComboBox(lowerFrame, values=['Yes', 'No'], width=150, font=('arial', 13), state='readonly')
-    withinDeadlineBox.grid(row=1, column=1, padx=10, pady=5)
+    withinDeadlineBox.grid(row=2, column=1, padx=10, pady=5)
     withinDeadlineBox.set('Select Here')
 
     rateLabel = CTkLabel(lowerFrame, text='Rate', font=('arial', 14, 'bold'), text_color='white')
-    rateLabel.grid(row=2, column=0, padx=10, pady=5, sticky='w')
+    rateLabel.grid(row=3, column=0, padx=10, pady=5, sticky='w')
 
     rateBox = CTkComboBox(lowerFrame, values=['*', '**', '***', '****', '*****'], width=150, font=('arial', 13), state='readonly')
-    rateBox.grid(row=2, column=1, padx=10, pady=5)
+    rateBox.grid(row=3, column=1, padx=10, pady=5)
     rateBox.set('Select Here')
 
     # Given Task and Complete Section
@@ -149,6 +165,7 @@ def Task_form(window):
     info = db.fetch_task_data()
     tree_view(info)
     deadline_insert()
+    task_id_insert()
 
 def tree_view(info):
     tree.delete(*tree.get_children())
@@ -171,6 +188,7 @@ def add_task():
     """
     Adds or updates a task for an employee if eligible.
     """
+    t_id=taskentry.get()
     id = idEntry.get()
     assign_status = db.check_comp(id)
 
@@ -187,7 +205,7 @@ def add_task():
 
     try:
         # Update task in the database
-        db.update_task(id, deadline, task)
+        db.update_task(t_id,id, deadline, task)
 
         # Refresh the Treeview with updated data
         info = db.fetch_task_data()
@@ -220,16 +238,19 @@ def clear_assign():
     DeadlineEntry.delete(0,END)
     Given_taskEntry.delete("1.0",END)
     deadline_insert()
+    taskentry.delete(0,END)
+    task_id_insert()
 
 
 def clear():
     idEntry2.delete(0, END)
+    taskidEntry2.delete(0, END)
     Given_taskEntry2.delete("1.0", END)
     withinDeadlineBox.set('Select Here')
     rateBox.set('Select Here')
 def comp_up():
 
-    id=idEntry2.get()
+    id=taskidEntry2.get()
     w_d_line=withinDeadlineBox.get()
     rBox=rateBox.get()
     db.complete(id,w_d_line,rBox)
@@ -240,6 +261,8 @@ def comp_up():
 def deadline_insert():
     current_date = datetime.date.today()
     DeadlineEntry.insert(0,current_date)
+def task_id_insert():
+    taskentry.insert(0,'T')
 
 def main():
     root = CTk()
