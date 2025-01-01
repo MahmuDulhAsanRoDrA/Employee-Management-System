@@ -64,26 +64,26 @@ def fetch_employee_by_id(emp_id):
 
 
 # Pay salary for the current month
-def pay_salary(emp_id, salary):
-    current_date = datetime.date.today()
-    current_month = current_date.strftime("%B")
-    current_year = current_date.year
-
-    conn = connect_db()
-    if conn:
-        cursor = conn.cursor()
-        try:
-            cursor.execute("""
-                INSERT INTO payroll (ID, Salary, Payment_Month, Payment_Year, Paid)
-                VALUES (%s, %s, %s, %s, 'Yes')
-                ON DUPLICATE KEY UPDATE Paid = 'Yes'
-            """, (emp_id, salary, current_month, current_year))
-            conn.commit()
-            messagebox.showinfo("Success", f"Salary paid for {current_month}, {current_year}")
-        except sql.MySQLError as e:
-            messagebox.showerror("Error", f"Failed to pay salary: {e}")
-        finally:
-            conn.close()
+# def pay_salary(emp_id, salary):
+#     current_date = datetime.date.today()
+#     current_month = current_date.strftime("%B")
+#     current_year = current_date.year
+#
+#     conn = connect_db()
+#     if conn:
+#         cursor = conn.cursor()
+#         try:
+#             cursor.execute("""
+#                 INSERT INTO payroll (ID, Salary, Payment_Month, Payment_Year, Paid)
+#                 VALUES (%s, %s, %s, %s, 'Yes')
+#                 ON DUPLICATE KEY UPDATE Paid = 'Yes'
+#             """, (emp_id, salary, current_month, current_year))
+#             conn.commit()
+#             messagebox.showinfo("Success", f"Salary paid for {current_month}, {current_year}")
+#         except sql.MySQLError as e:
+#             messagebox.showerror("Error", f"Failed to pay salary: {e}")
+#         finally:
+#             conn.close()
 
 
 # GUI Function for Payroll Form
@@ -91,6 +91,7 @@ def Payroll_Form(window):
     def clear():
         id_entry.delete(0, END)
         salary_entry.delete(0, END)
+        search_entry.delete(0, END)
 
     def select(event):
         search_entry.delete(0, END)
@@ -108,6 +109,10 @@ def Payroll_Form(window):
         tree.delete(*tree.get_children())
         for record in data:
             tree.insert('', 'end', values=record)
+    def clear1():
+        id_entry.delete(0, END)
+        month_combobox.set('Select Month')
+        year_entry.delete(0, END)
 
     def search_employee():
         emp_id = search_entry.get()
@@ -131,6 +136,7 @@ def Payroll_Form(window):
 
         if emp_id:
             payroll_data = fetch_payroll_by_id(emp_id)
+
         else:
             if selected_month == "Select Month" or not year:
                 messagebox.showerror("Error", "Select a valid month and enter a year.")
@@ -142,7 +148,7 @@ def Payroll_Form(window):
         else:
             tree.delete(*tree.get_children())
             messagebox.showinfo("No Data", f"No payroll records found for {selected_month}, {year}.")
-
+        clear1()
     def pay():
         emp_id = id_entry.get()
         salary = salary_entry.get()
@@ -170,6 +176,7 @@ def Payroll_Form(window):
 
                 if result[0] > 0:  # Payment already exists
                     messagebox.showinfo("Info", f"Payment for {current_month}, {current_year} has already been made.")
+                    clear()
                 else:
                     # Proceed to pay salary
                     cursor.execute("""
@@ -179,6 +186,7 @@ def Payroll_Form(window):
                     """, (emp_id, salary, current_month, current_year))
                     conn.commit()
                     messagebox.showinfo("Success", f"Salary paid for {current_month}, {current_year}")
+
                     refresh_treeview()
 
             except sql.MySQLError as e:
@@ -243,16 +251,20 @@ def Payroll_Form(window):
     Id.grid(row=1, column=0, padx=10, pady=5)
     search_entry = CTkEntry(employee_search_frame, width=150)
     search_entry.grid(row=1, column=1, padx=10, pady=5)
-    CTkButton(employee_search_frame, text="Search", command=search_employee).grid(row=1, column=2, padx=10, pady=5)
+    serch_button=CTkButton(employee_search_frame, text="Search", command=search_employee)
+    serch_button.grid(row=1, column=2, padx=10, pady=5)
 
-    CTkLabel(employee_search_frame, text="ID:", text_color="white").grid(row=2, column=0, padx=10, pady=5)
+    id_label=CTkLabel(employee_search_frame, text="ID:", text_color="white")
+    id_label.grid(row=2, column=0, padx=10, pady=5)
     id_entry = CTkEntry(employee_search_frame, width=150)
     id_entry.grid(row=2, column=1, padx=10, pady=5)
 
-    CTkLabel(employee_search_frame, text="Salary:", text_color="white").grid(row=3, column=0, padx=10, pady=5)
+    salary_label=CTkLabel(employee_search_frame, text="Salary:", text_color="white")
+    salary_label.grid(row=3, column=0, padx=10, pady=5)
     salary_entry = CTkEntry(employee_search_frame, width=150)
     salary_entry.grid(row=3, column=1, padx=10, pady=5)
-    CTkButton(employee_search_frame, text="Pay", command=pay).grid(row=3, column=2, padx=10, pady=5)
+    pay_button=CTkButton(employee_search_frame, text="Pay", command=pay)
+    pay_button.grid(row=3, column=2, padx=10, pady=5)
 
     # Search Section
     search_frame = CTkFrame(control_frame, fg_color="#088F8F")
