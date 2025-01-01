@@ -42,11 +42,11 @@ def search(role,value):
      MYCUR.execute(f'select * from data where {role}=%s',(value))
      result = MYCUR.fetchall()
      return result
-
-
 def delete_all():
      MYCUR.execute('delete from data')
      conn.commit()
+
+
 def fetch_ID():
      MYCUR.execute('select Id from data;')
      result=MYCUR.fetchall()
@@ -184,7 +184,7 @@ def fetch_role(ID):
     except sql.MySQLError as e:
         messagebox.showerror("Error", f"Error fetching role: {str(e)}")
         return None
-def update_task(id, deadline, task):
+def update_task(t_id,id, deadline, task):
     """
     Updates the task for a given employee. Inserts or updates the task table.
 
@@ -204,13 +204,13 @@ def update_task(id, deadline, task):
         # Insert or update task
         MYCUR.execute(
             """
-            INSERT INTO task (Emp_ID, Role, Assign_date, Given_task, deadline,Within_deadline,rate,complete)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO task (Task_Id,EMP_ID, Role, Assign_date, Given_task, deadline,Within_deadline,rate,complete)
+            VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 Given_task = VALUES(Given_task),
                 deadline = VALUES(deadline)
             """,
-            (id, role, current_date, task, deadline,"No","","No")
+            (t_id,id, role, current_date, task, deadline,"No","","No")
         )
         conn.commit()
         print("Task updated successfully.")
@@ -218,7 +218,7 @@ def update_task(id, deadline, task):
         messagebox.showerror("Error", f"Error updating task: {str(e)}")
 def fetch_task_data():
     current_date = datetime.date.today()
-    MYCUR.execute("Select Emp_ID, Role, Deadline,Within_Deadline,Rate,complete from task where Assign_date = %s",(current_date,))
+    MYCUR.execute("Select Task_Id,Emp_ID, Role, Deadline,Within_Deadline,Rate,complete from task where Assign_date = %s",(current_date,))
     info = MYCUR.fetchall()
     return info
 def fetch_today_task(emp_id):
@@ -238,10 +238,10 @@ def fetch_today_task(emp_id):
         MYCUR.execute(
             """
             SELECT Given_task FROM task
-            WHERE Emp_ID = %s AND Assign_date = %s
+            WHERE Task_ID = %s
             LIMIT 1
             """,
-            (emp_id, current_date)
+            (emp_id)
         )
         task = MYCUR.fetchone()
         return task
@@ -255,9 +255,9 @@ def complete(id,withindeadline,ratebox):
         """
         UPDATE task
         SET Within_deadline = %s, rate = %s, complete = %s
-        WHERE Emp_ID = %s AND Assign_date = %s
+        WHERE Task_ID = %s 
         """,
-        (withindeadline, ratebox, "YES", id, current_date)
+        (withindeadline, ratebox, "YES", id)
     )
     conn.commit()
 # def check_comp(id):
