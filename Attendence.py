@@ -70,18 +70,12 @@ def mark_leave():
         messagebox.showinfo("Marked Present", f"Employee {employee_id} marked as leave on \n{date} at {time}.")
     else:
         messagebox.showerror("Error", "Please enter or select an Employee ID")
-def back():
-    main_frame.destroy()  # Closes the current Attendance System window
-    import Menu  # Import the Menu module to navigate back
-    Menu.main()
+
 # Left frame for date and ID list
 def create_left_frame(main_frame):
     left_frame = CTkFrame(main_frame, fg_color='#2C3E50', corner_radius=10)
     left_frame.pack(side='left', expand=True, fill='both', padx=5, pady=5)
 
-    backbutton = CTkButton(left_frame, text='Back', font=('arial', 15, 'bold'), height=50, width=120,
-                           corner_radius=15, fg_color="#FF6F61", command=back )
-    backbutton.pack(side='top', fill='x', padx=10, pady=10)
     # Date Display
     today = datetime.date.today()
     date_frame = CTkFrame(left_frame, fg_color='#34495E', height=60, corner_radius=10)
@@ -99,10 +93,11 @@ def create_left_frame(main_frame):
     id_tree.column('ID', anchor='center', width=100)
     id_tree.pack(padx=10, pady=10, expand=True, fill='both')
 
+
     # Treeview Styling
     id_style = ttk.Style()
-    id_style.configure("Treeview.Heading", font=('Arial', 16, 'bold'), background='#34495E', foreground='black')
-    id_style.configure("Treeview", font=('Arial', 14), rowheight=25, background='#ECF0F1', fieldbackground='#ECF0F1')
+    id_style.configure('Treeview.Heading', font=('arial', 18, 'bold'),background='#34495E', foreground='black')
+    id_style.configure('Treeview', font=('arial', 13, 'bold'), rowheight=30, background='#363C40', foreground='#F2F2F2')
 
 
 
@@ -153,7 +148,7 @@ def create_right_frame(main_frame):
 
     leave_frame = CTkFrame(right_frame, fg_color='#58D68D', height=80, corner_radius=10)
     leave_frame.pack(side='top', padx=15, pady=10, fill='x')
-    l_button=CTkButton(leave_frame,text='Mark leave',font=('Arial',16),command=mark_leave)
+    l_button=CTkButton(leave_frame,text='Mark leave',font=('Arial',20,'bold'),command=mark_leave)
     l_button.pack(side='top',fill='x')
 
     l_Time = CTkLabel(leave_frame, text='Leave Time: -', font=('Arial', 16))
