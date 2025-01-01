@@ -218,7 +218,7 @@ def update_task(t_id,id, deadline, task):
         messagebox.showerror("Error", f"Error updating task: {str(e)}")
 def fetch_task_data():
     current_date = datetime.date.today()
-    MYCUR.execute("Select Task_Id,Emp_ID, Role, Deadline,Within_Deadline,Rate,complete from task where Assign_date = %s",(current_date,))
+    MYCUR.execute("Select Task_Id,Emp_ID, Role, Deadline,Within_Deadline,Rate,complete from task")
     info = MYCUR.fetchall()
     return info
 def fetch_today_task(emp_id):
